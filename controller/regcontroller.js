@@ -8,6 +8,13 @@ exports.regshow = (async (req, res) => {
     try {
         const { name, email, password, username, confirmpasword, phone } = req.body
         let record = await regm.findOne({ username: username });
+        let jwtSecretKey = process.env.JWT_SECRET_KEY
+        let data = {
+            time: Date(),
+            userId: 12,
+        }
+        const token = jwt.sign(data, jwtSecretKey);
+        console.log(token)
         if (record) {
             return res.status(400).json({
                 msg: "That user already exisits!",
@@ -24,11 +31,12 @@ exports.regshow = (async (req, res) => {
             confirmpasword: confirmpasword
         });
         const results = await user.save();
-        console.log("result", results);
+        // console.log("result", results);
         if (results) {
             return res.status(200).json({
                 msg: "Successfully created !!",
                 user: results,
+                token: token,
                 status: true
             });
         }
@@ -63,15 +71,26 @@ exports.loginshow = (async (req, res) => {
 })
 
 exports.datalist = (async (req, res) => {
-    try {
-        const record = await regm.find()
-        // console.log(record)
-        res.json({
-            msg: "succesfully",
-            data: record,
-            status: true
 
-        })
+    try {
+        const key = req.body && req.body.key
+        const record = await regm.aggregate([
+            {
+                $match: { status: { $eq: +key } }
+            }
+        ])
+        //console.log(record)
+
+        // console.log(record)
+        if (record) {
+            res.json({
+                msg: "succesfully",
+                data: record,
+                status: true
+
+            })
+        }
+
 
     } catch (error) {
         res.json({
@@ -81,6 +100,26 @@ exports.datalist = (async (req, res) => {
     }
 
 })
+
+exports.dataid = (async (req, res) => {
+    // console.log(req.params._id)
+    try {
+        const _id = req.params._id
+        const record = await regm.findById(_id)
+        res.json({
+            msg: "Suucessfully Id ",
+            data: record
+
+        })
+    } catch (error) {
+        res.json({
+            error: error,
+            msg: "Not get Id"
+        })
+    }
+
+})
+
 exports.datalid = (async (req, res) => {
     try {
         const id = req.params._id;
@@ -102,39 +141,51 @@ exports.datalid = (async (req, res) => {
 
 exports.delte = (async (req, res) => {
     try {
-        console.log(req.params._id)
-        const id = req.params._id
-        const record = await regm.findByIdAndDelete(id)
+        const id = req.params._id;
+
+        const record = await regm.findByIdAndUpdate(id, { status: 0 });
+        //  console.log("record", record);
         res.json({
-            record: record,
-            msg: "Successfully Delte"
+            msg: "success",
+            record: record
         })
     } catch (error) {
         res.json({
-            error: error,
-            msg: "not delte"
+            msg: "not valid id",
+            error: error
         })
-
     }
+
 })
 
 
-exports.dataid = (async (req, res) => {
-    //  console.log(req.params._id)
+exports.userList = (async (req, res) => {
+
     try {
-        const id = req.params._id
-        const record = await regm.findById(id)
-        res.json({
-            msg: "Suucessfully Id ",
-            data: record
+        let tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
+        let jwtSecretKey = process.env.JWT_SECRET_KEY;
+        const token = req.header(tokenHeaderKey);
 
+        const verified = jwt.verify(token, jwtSecretKey);
+        const record = await regm.find({})
+        if (verified) {
+            return res.json("Successfully Verified");
+        }
+        res.json({
+            msg: "Sucessfully senr all  data",
+            data: record,
+            token: token
         })
     } catch (error) {
         res.json({
             error: error,
-            msg: "Not get Id"
+            msg: "Not Usaers Data Send"
         })
     }
 
+
+    // console.log(record)
 })
+
+
 
