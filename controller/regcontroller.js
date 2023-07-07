@@ -5,7 +5,9 @@ exports.regshow = (async (req, res) => {
     try {
         const { name, email, password, username, confirmpasword, phone } = req.body
         let record = await regm.findOne({ username: username });
-        let jwtSecretKey = process.env.JWT_SECRET_KEY
+
+
+      //  let jwtSecretKey = process.env.JWT_SECRET_KEY
         // let data = {
         //     time: Date(),
         //     userId: 12,
@@ -47,6 +49,7 @@ exports.loginshow = (async (req, res) => {
         const { username, email, password } = req.body
         const user = await regm.findOne({ username: username });
         const isPassword = await regm.findOne({ password: password });
+
         if (!user || !isPassword) {
             res.json({
                 status: false,
