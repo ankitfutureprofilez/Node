@@ -26,10 +26,7 @@ const regSchema=mongoose.Schema({
         type :String,
         select:false
     },
-    status:{
-        type:Number,
-        default:1
-    },
+    status:{ type:Number, default: '1'} ,
     phone:Number,
    
 

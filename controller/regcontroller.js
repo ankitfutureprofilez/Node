@@ -1,20 +1,17 @@
 const regm = require('../model/Reg')
 
-
-
-
 exports.regshow = (async (req, res) => {
     //  console.log(req.body)
     try {
         const { name, email, password, username, confirmpasword, phone } = req.body
         let record = await regm.findOne({ username: username });
         let jwtSecretKey = process.env.JWT_SECRET_KEY
-        let data = {
-            time: Date(),
-            userId: 12,
-        }
-        const token = jwt.sign(data, jwtSecretKey);
-        console.log(token)
+        // let data = {
+        //     time: Date(),
+        //     userId: 12,
+        // }
+      //  const token = jwt.sign(data, jwtSecretKey);
+     //   console.log(token)
         if (record) {
             return res.status(400).json({
                 msg: "That user already exisits!",
@@ -36,7 +33,7 @@ exports.regshow = (async (req, res) => {
             return res.status(200).json({
                 msg: "Successfully created !!",
                 user: results,
-                token: token,
+             //   token: token,
                 status: true
             });
         }
@@ -125,7 +122,7 @@ exports.datalid = (async (req, res) => {
         const id = req.params._id;
         console.log(req.body)
         const record = await regm.findByIdAndUpdate(id, req.body);
-        console.log("record", record);
+     //   console.log("record", record);
         res.json({
             msg: "success",
             record: record
@@ -162,19 +159,19 @@ exports.delte = (async (req, res) => {
 exports.userList = (async (req, res) => {
 
     try {
-        let tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
-        let jwtSecretKey = process.env.JWT_SECRET_KEY;
-        const token = req.header(tokenHeaderKey);
+       // let tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
+      //  let jwtSecretKey = process.env.JWT_SECRET_KEY;
+      //  const token = req.header(tokenHeaderKey);
 
-        const verified = jwt.verify(token, jwtSecretKey);
+       // const verified = jwt.verify(token, jwtSecretKey);
         const record = await regm.find({})
-        if (verified) {
-            return res.json("Successfully Verified");
-        }
+      //  if (verified) {
+       //     return res.json("Successfully Verified");
+      //  }
         res.json({
             msg: "Sucessfully senr all  data",
             data: record,
-            token: token
+          //  token: token
         })
     } catch (error) {
         res.json({
