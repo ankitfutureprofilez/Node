@@ -1,11 +1,13 @@
 const express=require("express");
 const cors=require("cors");
 const jwt = require('jsonwebtoken');
+//const expressValidator = require('express-validator')
 require('dotenv').config()
 
 const app=express()
 app.use(express.json())
 app.use(cors())
+//app.use(expressValidator())
 const apiroter=require("./router/Reg")
 const mongoose=require("mongoose")
 mongoose.connect(`${process.env.DB_URL}`)

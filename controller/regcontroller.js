@@ -1,5 +1,6 @@
 const regm = require('../model/Reg')
-
+var jwt = require('jsonwebtoken');
+require('dotenv').config()
 exports.regshow = (async (req, res) => {
     //  console.log(req.body)
     try {
@@ -7,13 +8,6 @@ exports.regshow = (async (req, res) => {
         let record = await regm.findOne({ username: username });
 
 
-      //  let jwtSecretKey = process.env.JWT_SECRET_KEY
-        // let data = {
-        //     time: Date(),
-        //     userId: 12,
-        // }
-      //  const token = jwt.sign(data, jwtSecretKey);
-     //   console.log(token)
         if (record) {
             return res.status(400).json({
                 msg: "That user already exisits!",
@@ -30,12 +24,12 @@ exports.regshow = (async (req, res) => {
             confirmpasword: confirmpasword
         });
         const results = await user.save();
+
         // console.log("result", results);
         if (results) {
             return res.status(200).json({
                 msg: "Successfully created !!",
                 user: results,
-             //   token: token,
                 status: true
             });
         }
@@ -56,11 +50,18 @@ exports.loginshow = (async (req, res) => {
                 msg: "Invalid login or password"
             });
         }
+        const token = jwt.sign({ user }, process.env.JWT_SECRET, {
+            expiresIn: "1h",
+        });
+//       console.log(token)
         res.json({
             status: true,
             user: user,
-            msg: "Login successfully !!"
+            msg: "Login successfully !!",
+            token: token
         });
+
+
     } catch (error) {
         console.log(error)
         res.status(200).json({
@@ -79,9 +80,7 @@ exports.datalist = (async (req, res) => {
                 $match: { status: { $eq: +key } }
             }
         ])
-        //console.log(record)
 
-        // console.log(record)
         if (record) {
             res.json({
                 msg: "succesfully",
@@ -102,7 +101,6 @@ exports.datalist = (async (req, res) => {
 })
 
 exports.dataid = (async (req, res) => {
-    // console.log(req.params._id)
     try {
         const _id = req.params._id
         const record = await regm.findById(_id)
@@ -123,9 +121,8 @@ exports.dataid = (async (req, res) => {
 exports.datalid = (async (req, res) => {
     try {
         const id = req.params._id;
-        console.log(req.body)
+     //   console.log(req.body)
         const record = await regm.findByIdAndUpdate(id, req.body);
-     //   console.log("record", record);
         res.json({
             msg: "success",
             record: record
@@ -144,7 +141,6 @@ exports.delte = (async (req, res) => {
         const id = req.params._id;
 
         const record = await regm.findByIdAndUpdate(id, { status: 0 });
-        //  console.log("record", record);
         res.json({
             msg: "success",
             record: record
@@ -162,19 +158,13 @@ exports.delte = (async (req, res) => {
 exports.userList = (async (req, res) => {
 
     try {
-       // let tokenHeaderKey = process.env.TOKEN_HEADER_KEY;
-      //  let jwtSecretKey = process.env.JWT_SECRET_KEY;
-      //  const token = req.header(tokenHeaderKey);
-
-       // const verified = jwt.verify(token, jwtSecretKey);
+    
         const record = await regm.find({})
-      //  if (verified) {
-       //     return res.json("Successfully Verified");
-      //  }
+    //    console.log(record)
+     
         res.json({
             msg: "Sucessfully senr all  data",
             data: record,
-          //  token: token
         })
     } catch (error) {
         res.json({
@@ -184,8 +174,22 @@ exports.userList = (async (req, res) => {
     }
 
 
-    // console.log(record)
 })
 
 
 
+
+exports.appgetr = (async (req, res) => {
+    try {
+        const user = await regm.find({})
+        //console.log(user)
+        res.json({
+            status: 'success',
+            message: 'Logged In User Information.',
+            data: user
+        });
+    } catch (error) {
+        console.log(error)
+    }
+
+})
