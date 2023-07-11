@@ -154,7 +154,6 @@ exports.delte = (async (req, res) => {
 
 })
 
-
 exports.userList = (async (req, res) => {
 
     try {
@@ -193,3 +192,5 @@ exports.appgetr = (async (req, res) => {
     }
 
 })
+
+
