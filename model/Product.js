@@ -33,7 +33,8 @@ const productschema=mongoose.Schema({
        // data: Buffer,
         type: String
   
-    }
+    },
+    userId:{type:Number}
 })
 
 

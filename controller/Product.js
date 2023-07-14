@@ -1,11 +1,15 @@
 const e = require('express')
 const productm = require('../model/Product')
+const regm = require('../model/Reg')
 
 
 exports.productadd = (async (req, res) => {
-    //console.log(req.body)
     // console.log("File: ", req.file);
+    // const dataw=data.userId
+
     try {
+
+        const userId = req.user.userId
 
         const { name, desc, price, year, emi, thumbnail, rating } = req.body
         //console.log(req.file)
@@ -16,17 +20,22 @@ exports.productadd = (async (req, res) => {
             year: year,
             emi: emi,
             thumbnail: thumbnail,
-            rating: rating
+            rating: rating,
+            userId: userId
         });
         const result = await record.save()
-        console.log(result)
+        //   console.log(result)
         if (result) {
             res.json({
                 result: result,
                 msg: "Suucessfully ",
                 status: 200
             })
+
         }
+
+
+
     } catch (error) {
         console.log(error)
         res.json({
@@ -44,13 +53,29 @@ exports.productadd = (async (req, res) => {
 exports.productshow = (async (req, res) => {
 
     try {
-        const record = await productm.find({})
+
+        const userId = req.user.userId
+        //  const userId = req.query.userId
+        //const userId = req.params.userId;
+
+        //  console.log(userId)
+        const record = await productm.find(
+            { 
+                price: { $gt: 5000 }, 
+                rating: { $gt: 2 }, 
+                year: { $gte: 2000 }, 
+                userId: userId });
+   ///     console.log(record)
+
         res.json({
             data: record,
-            msg: "Suucessfully ",
+            msg: "Succes",
             status: 200
         })
+
+
     } catch (error) {
+        console.log(error)
         res.json({
             error: error,
             msg: "Failed",
@@ -65,28 +90,28 @@ exports.Productupdate = (async (req, res) => {
     //  console.log(req.params.id)
     //console.log(req.body)
     try {
-        const id = req.params.id
-        const { name, desc, price, rating, emi, year, thumbnail } = req.body
+        const id = req.params.id;
+        const { name, desc, price, rating, emi, year, thumbnail } = req.body;
         const record = await productm.findByIdAndUpdate(id, {
             name: name,
-            desc: desc, 
+            desc: desc,
             thumbnail: thumbnail,
-            price: price, 
-            rating: rating, 
+            price: price,
+            rating: rating,
             emi: emi,
             year: year
-        })
+        });
         res.json({
             data: record,
-            msg: "Suucessfully Update",
+            msg: "Successfully updated",
             status: 200
-        })
+        });
     } catch (error) {
-        res.json({
+        res.status(400).json({
             error: error,
-            msg: "failed",
+            msg: "Failed to update",
             status: 400
-        })
+        });
     }
 })
 
@@ -113,23 +138,42 @@ exports.productdelete = (async (req, res) => {
 
 })
 
-exports.productsingleid=(async(req,res)=>{
-  console.log(req.params.id)
-   try{
-    const id=req.params.id
-    const record=  await productm.findById(id)
-    console.log(record)
+exports.productsingleid = (async (req, res) => {
+    console.log(req.params.id)
+    try {
+        const id = req.params.id
+        const record = await productm.findById(id)
+      //  console.log(record)
+        res.json({
+            data: record,
+            msg: "succesfully fect id",
+            status: 200
+        })
+    } catch (error) {
+        console.log(error)
+        res.json({
+            msg: "cannot get id",
+            status: 200, error: error
+        })
+    }
+
+})
+
+
+exports.usershow=(async(req,res)=>{
+try{
+
+    const record= await productm.find({})
+    //console.log(record)
     res.json({
-       data:record,
-       msg:"succesfully fect id",
-       status:200
+        data:record,
+        msg:"succesfuly",
+        status:200
     })
-   }catch(  error ){
-    console.log(error)
-    res.json({
-        msg:"cannot get id",
-        status:200,error:error
-     })
-   }
+}catch(err){
+    console.log(err)
+}
+
+
 
 })

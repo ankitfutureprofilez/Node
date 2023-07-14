@@ -34,9 +34,9 @@ router.put('/delete/:_id', regc.delte);
 
 router.get('/useralldata', verifyToken, regc.appgetr)
 
-router.post('/product',upload.single('file'),productc.productadd)
+router.post('/product',verifyToken,productc.productadd)
 
-router.get('/product',productc.productshow)
+router.get('/product',verifyToken,productc.productshow)
 
 
 router.patch('/Product/:id',productc.Productupdate)
@@ -44,5 +44,7 @@ router.patch('/Product/:id',productc.Productupdate)
 router.delete('/product/:id',productc.productdelete)
 
 router.get('/Products/:id',productc.productsingleid)
+
+router.get('/usershow',productc.usershow)
 
 module.exports = router

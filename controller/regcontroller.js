@@ -1,27 +1,35 @@
 const regm = require('../model/Reg')
 var jwt = require('jsonwebtoken');
 require('dotenv').config()
+//const mongoose = require('mongoose');
+
+
+
 exports.regshow = (async (req, res) => {
-    //  console.log(req.body)
+    console.log(req.body)
     try {
-        const { name, email, password, username, confirmpasword, phone } = req.body
-        let record = await regm.findOne({ username: username });
-
-
-        if (record) {
+        const { name, email, password, username, confirmpassword, phone } = req.body
+        const lastuserid = await regm.findOne({}, "userId").sort({ userId: -1 });
+        const newUserId = lastuserid ? lastuserid.userId + 1 : 1;
+        let isAlready = await regm.findOne({ username: username });
+        if (isAlready) {
             return res.status(400).json({
                 msg: "That user already exisits!",
                 status: false
             });
         }
+        console.log("last", lastuserid)
+        //  const userId = new mongoose.Types.ObjectId();
+        //  const registrationTime = new Date();
         // Insert the new user if they do not exist yet
         let user = new regm({
+            userId: newUserId,
             name: name,
             email: email,
             password: password,
             username: username,
             phone: phone,
-            confirmpasword: confirmpasword
+            confirmpasword: confirmpassword
         });
         const results = await user.save();
 
@@ -34,6 +42,7 @@ exports.regshow = (async (req, res) => {
             });
         }
     } catch (error) {
+        console.log(error)
         res.json(error)
     }
 });
@@ -53,7 +62,7 @@ exports.loginshow = (async (req, res) => {
         const token = jwt.sign({ user }, process.env.JWT_SECRET, {
             expiresIn: "1h",
         });
-//       console.log(token)
+        //       console.log(token)
         res.json({
             status: true,
             user: user,
@@ -121,7 +130,7 @@ exports.dataid = (async (req, res) => {
 exports.datalid = (async (req, res) => {
     try {
         const id = req.params._id;
-     //   console.log(req.body)
+        //   console.log(req.body)
         const record = await regm.findByIdAndUpdate(id, req.body);
         res.json({
             msg: "success",
@@ -157,10 +166,10 @@ exports.delte = (async (req, res) => {
 exports.userList = (async (req, res) => {
 
     try {
-    
+
         const record = await regm.find({})
-    //    console.log(record)
-     
+        //    console.log(record)
+
         res.json({
             msg: "Sucessfully senr all  data",
             data: record,
